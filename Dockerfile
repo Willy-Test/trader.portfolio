@@ -13,7 +13,9 @@
 #   limitations under the License.
 
 FROM websphere-liberty:microProfile
+RUN mkdir /opt/ibm/wlp/etc/
 COPY server.xml /config/server.xml
+COPY repositories.properties /opt/ibm/wlp/etc/repositories.properties
 COPY db2jcc4.jar /db2jcc4.jar
 COPY target/portfolio-1.0-SNAPSHOT.war /config/apps/Portfolio.war
 RUN installUtility install --acceptLicense defaultServer
