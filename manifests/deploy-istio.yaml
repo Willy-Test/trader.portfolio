@@ -53,30 +53,30 @@ spec:
       - args:
         - proxy
         - sidecar
-        - -v
-        - "2"
         - --configPath
         - /etc/istio/proxy
         - --binaryPath
         - /usr/local/bin/envoy
         - --serviceCluster
-        - portfolio
+        - sleep
         - --drainDuration
-        - 45s
+        - 2s
         - --parentShutdownDuration
-        - 1m0s
+        - 3s
         - --discoveryAddress
-        - istio-pilot.istio-system:8080
+        - istio-pilot.istio-system:15003
         - --discoveryRefreshDelay
         - 1s
         - --zipkinAddress
         - zipkin.istio-system:9411
         - --connectTimeout
-        - 10s
+        - 1s
         - --statsdUdpAddress
         - istio-mixer.istio-system:9125
         - --proxyAdminPort
         - "15000"
+        - --controlPlaneAuthPolicy
+        - NONE
         env:
         - name: POD_NAME
           valueFrom:
@@ -90,13 +90,13 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        image: docker.io/istio/proxy_debug:0.2.12
+        image: docker.io/istio/proxy:0.5.0
         imagePullPolicy: IfNotPresent
         name: istio-proxy
         resources: {}
         securityContext:
-          privileged: true
-          readOnlyRootFilesystem: false
+          privileged: false
+          readOnlyRootFilesystem: true
           runAsUser: 1337
         volumeMounts:
         - mountPath: /etc/istio/proxy
@@ -104,15 +104,13 @@ spec:
         - mountPath: /etc/certs/
           name: istio-certs
           readOnly: true
-      imagePullSecrets:
-      - name: admin.registrykey
       initContainers:
       - args:
         - -p
         - "15001"
         - -u
         - "1337"
-        image: docker.io/istio/proxy_init:0.2.12
+        image: docker.io/istio/proxy_init:0.5.0
         imagePullPolicy: IfNotPresent
         name: istio-init
         resources: {}
@@ -142,7 +140,6 @@ spec:
         secret:
           optional: true
           secretName: istio.default
-status: {}
 ---
 #Deploy the service
 apiVersion: v1
